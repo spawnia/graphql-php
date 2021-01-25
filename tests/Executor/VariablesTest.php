@@ -112,7 +112,7 @@ class VariablesTest extends TestCase
         );
     }
 
-    private function executeQuery($query, $variableValues = null)
+    private function executeQuery($query, array $variableValues = null)
     {
         $document = Parser::parse($query);
 

@@ -44,7 +44,7 @@ class OperationParams
 
     /**
      * @api
-     * @var mixed[]|null
+     * @var array<string, mixed>
      */
     public $variables;
 
@@ -63,7 +63,7 @@ class OperationParams
     /**
      * Creates an instance from given array
      *
-     * @param mixed[] $params
+     * @param array<string, mixed> $params
      *
      * @api
      */
@@ -105,7 +105,7 @@ class OperationParams
         $instance->query      = $params['query'];
         $instance->queryId    = $params['queryid'] ?? $params['documentid'] ?? $params['id'];
         $instance->operation  = $params['operationname'];
-        $instance->variables  = $params['variables'];
+        $instance->variables  = $params['variables'] ?? [];
         $instance->extensions = $params['extensions'];
         $instance->readOnly   = $readonly;
 

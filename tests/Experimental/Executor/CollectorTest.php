@@ -36,21 +36,24 @@ use const JSON_UNESCAPED_UNICODE;
 class CollectorTest extends TestCase
 {
     /**
-     * @param mixed[]|null $variableValues
+     * @param array<string, mixed> $variableValues
      *
      * @dataProvider provideForTestCollectFields
      */
-    public function testCollectFields(Schema $schema, DocumentNode $documentNode, string $operationName, ?array $variableValues)
+    public function testCollectFields(Schema $schema, DocumentNode $documentNode, string $operationName, array $variableValues = [])
     {
         $runtime = new class($variableValues) implements Runtime
         {
             /** @var Throwable[] */
             public $errors = [];
 
-            /** @var mixed[]|null */
+            /** @var array<string, mixed> */
             public $variableValues;
 
-            public function __construct($variableValues)
+            /**
+             * @param array<string, mixed> $variableValues
+             */
+            public function __construct(array $variableValues)
             {
                 $this->variableValues = $variableValues;
             }

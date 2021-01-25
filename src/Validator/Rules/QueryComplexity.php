@@ -12,8 +12,10 @@ use GraphQL\Language\AST\FragmentSpreadNode;
 use GraphQL\Language\AST\InlineFragmentNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeKind;
+use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Language\AST\SelectionSetNode;
+use GraphQL\Language\AST\VariableDefinitionNode;
 use GraphQL\Language\Visitor;
 use GraphQL\Language\VisitorOperation;
 use GraphQL\Type\Definition\Directive;
@@ -30,10 +32,10 @@ class QueryComplexity extends QuerySecurityRule
     /** @var int */
     private $maxQueryComplexity;
 
-    /** @var mixed[]|null */
+    /** @var array<string, mixed> */
     private $rawVariableValues = [];
 
-    /** @var ArrayObject */
+    /** @var NodeList<VariableDefinitionNode> */
     private $variableDefs;
 
     /** @var ArrayObject */
@@ -54,7 +56,7 @@ class QueryComplexity extends QuerySecurityRule
     {
         $this->context = $context;
 
-        $this->variableDefs     = new ArrayObject();
+        $this->variableDefs     = new NodeList([]);
         $this->fieldNodeAndDefs = new ArrayObject();
         $this->complexity       = 0;
 
@@ -222,15 +224,18 @@ class QueryComplexity extends QuerySecurityRule
         return false;
     }
 
-    public function getRawVariableValues()
+    /**
+     * @return array<string, mixed>
+     */
+    public function getRawVariableValues(): array
     {
         return $this->rawVariableValues;
     }
 
     /**
-     * @param mixed[]|null $rawVariableValues
+     * @param array<string, mixed>|null $rawVariableValues TODO make non-nullable
      */
-    public function setRawVariableValues(?array $rawVariableValues = null)
+    public function setRawVariableValues(?array $rawVariableValues = null): void
     {
         $this->rawVariableValues = $rawVariableValues ?? [];
     }

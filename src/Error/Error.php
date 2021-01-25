@@ -79,7 +79,7 @@ class Error extends Exception implements JsonSerializable, ClientAware
     /** @var string */
     protected $category;
 
-    /** @var mixed[]|null */
+    /** @var array<mixed> */
     protected $extensions;
 
     /**
@@ -112,11 +112,12 @@ class Error extends Exception implements JsonSerializable, ClientAware
         $this->source     = $source;
         $this->positions  = $positions;
         $this->path       = $path;
-        $this->extensions = count($extensions) > 0 ? $extensions : (
-        $previous instanceof self
-            ? $previous->extensions
-            : []
-        );
+        $this->extensions = count($extensions) > 0
+            ? $extensions
+            : ($previous instanceof self
+                ? $previous->extensions
+                : []
+            );
 
         if ($previous instanceof ClientAware) {
             $this->isClientSafe = $previous->isClientSafe();
@@ -352,7 +353,7 @@ class Error extends Exception implements JsonSerializable, ClientAware
         if (count($this->path ?? []) > 0) {
             $arr['path'] = $this->path;
         }
-        if (count($this->extensions ?? []) > 0) {
+        if (count($this->extensions) > 0) {
             $arr['extensions'] = $this->extensions;
         }
 

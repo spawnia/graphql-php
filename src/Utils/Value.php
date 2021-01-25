@@ -37,9 +37,10 @@ class Value
      * Given a type and any value, return a runtime value coerced to match the type.
      *
      * @param ScalarType|EnumType|InputObjectType|ListOfType|NonNull $type
-     * @param mixed[]                                                $path
+     * @param array{prev: array<mixed>, key: string|null}|null                                                $path
+     * @return array{errors: array<int, Error>|null, value: mixed}
      */
-    public static function coerceValue($value, InputType $type, $blameNode = null, ?array $path = null)
+    public static function coerceValue($value, InputType $type, $blameNode = null, ?array $path = null): array
     {
         if ($type instanceof NonNull) {
             if ($value === null) {
@@ -219,7 +220,12 @@ class Value
         throw new Error(sprintf('Unexpected type %s', $type->name));
     }
 
-    private static function ofErrors($errors)
+    /**
+     * @param array<int, Error> $errors
+     *
+     * @return array{errors: array<int, Error>, value: stdClass}
+     */
+    private static function ofErrors(array $errors): array
     {
         return ['errors' => $errors, 'value' => Utils::undefined()];
     }
@@ -227,11 +233,9 @@ class Value
     /**
      * @param string                   $message
      * @param Node                     $blameNode
-     * @param mixed[]|null             $path
+     * @param array{prev: array<mixed>, key: string|null}|null             $path
      * @param string                   $subMessage
      * @param Exception|Throwable|null $originalError
-     *
-     * @return Error
      */
     private static function coercionError(
         $message,
@@ -239,7 +243,7 @@ class Value
         ?array $path = null,
         $subMessage = null,
         $originalError = null
-    ) {
+    ): Error {
         $pathStr = self::printPath($path);
 
         // Return a GraphQLError instance
@@ -258,11 +262,11 @@ class Value
     /**
      * Build a string describing the path into the value where the error was found
      *
-     * @param mixed[]|null $path
+     * @param array{prev: array<mixed>, key: string|null}|null $path
      *
      * @return string
      */
-    private static function printPath(?array $path = null)
+    private static function printPath(?array $path = null): string
     {
         $pathStr     = '';
         $currentPath = $path;
@@ -278,11 +282,12 @@ class Value
     }
 
     /**
-     * @param mixed $value
+     * @template T
+     * @param T $value
      *
-     * @return (mixed|null)[]
+     * @return array{errors: null, value: T}
      */
-    private static function ofValue($value)
+    private static function ofValue($value): array
     {
         return ['errors' => null, 'value' => $value];
     }

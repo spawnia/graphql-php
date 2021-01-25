@@ -22,6 +22,7 @@ use GraphQL\Type\Schema as SchemaType;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\ValidationRule;
+use ArrayAccess;
 use function array_values;
 use function count;
 use function trigger_error;
@@ -73,7 +74,7 @@ class GraphQL
      * @param string|DocumentNode $source
      * @param mixed               $rootValue
      * @param mixed               $contextValue
-     * @param mixed[]|null        $variableValues
+     * @param array<string, mixed>        $variableValues
      * @param ValidationRule[]    $validationRules
      *
      * @api
@@ -83,7 +84,7 @@ class GraphQL
         $source,
         $rootValue = null,
         $contextValue = null,
-        $variableValues = null,
+        array $variableValues = [],
         ?string $operationName = null,
         ?callable $fieldResolver = null,
         ?array $validationRules = null
@@ -112,7 +113,7 @@ class GraphQL
      * @param string|DocumentNode   $source
      * @param mixed                 $rootValue
      * @param mixed                 $context
-     * @param mixed[]|null          $variableValues
+     * @param array<string, mixed>          $variableValues
      * @param ValidationRule[]|null $validationRules
      *
      * @api
@@ -123,7 +124,7 @@ class GraphQL
         $source,
         $rootValue = null,
         $context = null,
-        $variableValues = null,
+        array $variableValues = [],
         ?string $operationName = null,
         ?callable $fieldResolver = null,
         ?array $validationRules = null
@@ -135,7 +136,6 @@ class GraphQL
                 $documentNode = Parser::parse(new Source($source ?? '', 'GraphQL'));
             }
 
-            // FIXME
             if (count($validationRules ?? []) === 0) {
                 /** @var QueryComplexity $queryComplexity */
                 $queryComplexity = DocumentValidator::getRule(QueryComplexity::class);
@@ -181,7 +181,7 @@ class GraphQL
      * @param string|DocumentNode $source
      * @param mixed               $rootValue
      * @param mixed               $contextValue
-     * @param mixed[]|null        $variableValues
+     * @param array<string, mixed>        $variableValues
      *
      * @return Promise|mixed[]
      *
@@ -192,7 +192,7 @@ class GraphQL
         $source,
         $rootValue = null,
         $contextValue = null,
-        $variableValues = null,
+        array $variableValues = [],
         ?string $operationName = null
     ) {
         trigger_error(
@@ -228,7 +228,7 @@ class GraphQL
      * @param string|DocumentNode $source
      * @param mixed               $rootValue
      * @param mixed               $contextValue
-     * @param mixed[]|null        $variableValues
+     * @param array<string, mixed>        $variableValues
      *
      * @return ExecutionResult|Promise
      *
@@ -239,7 +239,7 @@ class GraphQL
         $source,
         $rootValue = null,
         $contextValue = null,
-        $variableValues = null,
+        array $variableValues = [],
         ?string $operationName = null
     ) {
         trigger_error(

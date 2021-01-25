@@ -35,7 +35,7 @@ class ExecutionContext
     /** @var OperationDefinitionNode */
     public $operation;
 
-    /** @var mixed[] */
+    /** @var array<string, mixed> */
     public $variableValues;
 
     /** @var callable */
@@ -47,13 +47,16 @@ class ExecutionContext
     /** @var PromiseAdapter */
     public $promiseAdapter;
 
+    /**
+     * @param array<string, mixed> $variableValues
+     */
     public function __construct(
         $schema,
         $fragments,
         $rootValue,
         $contextValue,
         $operation,
-        $variableValues,
+        array $variableValues,
         $errors,
         $fieldResolver,
         $promiseAdapter

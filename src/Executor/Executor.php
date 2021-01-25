@@ -76,7 +76,7 @@ class Executor
      *
      * @param mixed|null                    $rootValue
      * @param mixed|null                    $contextValue
-     * @param array<mixed>|ArrayAccess|null $variableValues
+     * @param array<string, mixed> $variableValues
      * @param string|null                   $operationName
      *
      * @return ExecutionResult|Promise
@@ -88,7 +88,7 @@ class Executor
         DocumentNode $documentNode,
         $rootValue = null,
         $contextValue = null,
-        $variableValues = null,
+        array $variableValues = [],
         $operationName = null,
         ?callable $fieldResolver = null
     ) {
@@ -122,7 +122,7 @@ class Executor
      *
      * @param mixed|null        $rootValue
      * @param mixed|null        $contextValue
-     * @param array<mixed>|null $variableValues
+     * @param array<string, mixed> $variableValues
      * @param string|null       $operationName
      *
      * @return Promise
@@ -135,7 +135,7 @@ class Executor
         DocumentNode $documentNode,
         $rootValue = null,
         $contextValue = null,
-        $variableValues = null,
+        $variableValues = [],
         $operationName = null,
         ?callable $fieldResolver = null
     ) {

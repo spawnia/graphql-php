@@ -25,7 +25,7 @@ class FieldDefinition
     /** @var string */
     public $name;
 
-    /** @var FieldArgument[] */
+    /** @var array<int, FieldArgument> */
     public $args;
 
     /**
@@ -170,7 +170,7 @@ class FieldDefinition
      */
     public function getArg($name)
     {
-        foreach ($this->args ?? [] as $arg) {
+        foreach ($this->args as $arg) {
             /** @var FieldArgument $arg */
             if ($arg->name === $name) {
                 return $arg;

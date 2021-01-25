@@ -309,7 +309,7 @@ class AST
      * | Null Value           | null          |
      *
      * @param VariableNode|NullValueNode|IntValueNode|FloatValueNode|StringValueNode|BooleanValueNode|EnumValueNode|ListValueNode|ObjectValueNode|null $valueNode
-     * @param mixed[]|null                                                                                                                             $variables
+     * @param array<string, mixed>|null                                                                                                                             $variables
      *
      * @return mixed[]|stdClass|null
      *

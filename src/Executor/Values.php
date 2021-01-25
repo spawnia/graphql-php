@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GraphQL\Executor;
 
+use ArrayAccess;
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\BooleanValueNode;
@@ -54,12 +55,12 @@ class Values
      * variable definitions and arbitrary input. If the input cannot be coerced
      * to match the variable definitions, a Error will be thrown.
      *
-     * @param VariableDefinitionNode[] $varDefNodes
-     * @param mixed[]                  $inputs
+     * @param NodeList<VariableDefinitionNode> $varDefNodes
+     * @param array<string, mixed>|ArrayAccess<string, mixed>                  $inputs TODO change to hard array requirement
      *
-     * @return mixed[]
+     * @return array{0: array<int, string> | null, 1: array<string, mixed>}
      */
-    public static function getVariableValues(Schema $schema, $varDefNodes, array $inputs)
+    public static function getVariableValues(Schema $schema, NodeList $varDefNodes, $inputs): array
     {
         $errors        = [];
         $coercedValues = [];
@@ -109,7 +110,7 @@ class Values
                         // Otherwise, a non-null value was provided, coerce it to the expected
                         // type or report an error if coercion fails.
                         $coerced = Value::coerceValue($value, $varType, $varDefNode);
-                        /** @var Error[] $coercionErrors */
+                        /** @var array<Error>|null $coercionErrors */
                         $coercionErrors = $coerced['errors'];
                         if (count($coercionErrors ?? []) > 0) {
                             $messagePrelude = sprintf(
@@ -138,7 +139,7 @@ class Values
         }
 
         if (count($errors) > 0) {
-            return [$errors, null];
+            return [$errors, []];
         }
 
         return [null, $coercedValues];
@@ -152,11 +153,11 @@ class Values
      * If the directive does not exist on the node, returns undefined.
      *
      * @param FragmentSpreadNode|FieldNode|InlineFragmentNode|EnumValueDefinitionNode|FieldDefinitionNode $node
-     * @param mixed[]|null                                                                                $variableValues
+     * @param array<string, mixed>                                                                                $variableValues
      *
-     * @return mixed[]|null
+     * @return array<string, mixed>|null
      */
-    public static function getDirectiveValues(Directive $directiveDef, $node, $variableValues = null)
+    public static function getDirectiveValues(Directive $directiveDef, $node, array $variableValues = []): ?array
     {
         if (isset($node->directives) && $node->directives instanceof NodeList) {
             $directiveNode = Utils::find(
@@ -180,13 +181,13 @@ class Values
      *
      * @param FieldDefinition|Directive $def
      * @param FieldNode|DirectiveNode   $node
-     * @param mixed[]                   $variableValues
+     * @param array<string, mixed>                   $variableValues
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      *
      * @throws Error
      */
-    public static function getArgumentValues($def, $node, $variableValues = null)
+    public static function getArgumentValues($def, $node, array $variableValues = []): array
     {
         if (count($def->args) === 0) {
             return [];
@@ -204,14 +205,14 @@ class Values
     /**
      * @param FieldDefinition|Directive $fieldDefinition
      * @param ArgumentNode[]            $argumentValueMap
-     * @param mixed[]                   $variableValues
+     * @param array<string, mixed>                   $variableValues
      * @param Node|null                 $referenceNode
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      *
      * @throws Error
      */
-    public static function getArgumentValuesForMap($fieldDefinition, $argumentValueMap, $variableValues = null, $referenceNode = null)
+    public static function getArgumentValuesForMap($fieldDefinition, $argumentValueMap, array $variableValues, $referenceNode = null): array
     {
         $argumentDefinitions = $fieldDefinition->args;
         $coercedValues       = [];
@@ -223,7 +224,7 @@ class Values
 
             if ($argumentValueNode instanceof VariableNode) {
                 $variableName = $argumentValueNode->name->value;
-                $hasValue     = array_key_exists($variableName, $variableValues ?? []);
+                $hasValue     = array_key_exists($variableName, $variableValues);
                 $isNull       = $hasValue ? $variableValues[$variableName] === null : false;
             } else {
                 $hasValue = $argumentValueNode !== null;
@@ -267,7 +268,6 @@ class Values
                     $coercedValues[$name] = null;
                 } elseif ($argumentValueNode instanceof VariableNode) {
                     $variableName = $argumentValueNode->name->value;
-                    Utils::invariant($variableValues !== null, 'Must exist for hasValue to be true.');
                   // Note: This does no further checking that this variable is correct.
                   // This assumes that this query has been validated and the variable
                   // usage here is of the correct type.

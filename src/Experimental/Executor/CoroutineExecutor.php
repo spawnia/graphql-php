@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GraphQL\Experimental\Executor;
 
+use ArrayAccess;
 use Generator;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
@@ -62,10 +63,10 @@ class CoroutineExecutor implements Runtime, ExecutorImplementation
     /** @var mixed|null */
     private $contextValue;
 
-    /** @var mixed|null */
+    /** @var array|ArrayAccess|null */
     private $rawVariableValues;
 
-    /** @var mixed|null */
+    /** @var array<string, mixed> */
     private $variableValues;
 
     /** @var DocumentNode */
@@ -101,7 +102,7 @@ class CoroutineExecutor implements Runtime, ExecutorImplementation
         DocumentNode $documentNode,
         $rootValue,
         $contextValue,
-        $rawVariableValues,
+        $rawVariableValues, // TODO typehint this to be an array
         ?string $operationName,
         callable $fieldResolver
     ) {
@@ -117,7 +118,7 @@ class CoroutineExecutor implements Runtime, ExecutorImplementation
         $this->promiseAdapter    = $promiseAdapter;
         $this->rootValue         = $rootValue;
         $this->contextValue      = $contextValue;
-        $this->rawVariableValues = $rawVariableValues;
+        $this->rawVariableValues = $rawVariableValues ?? [];
         $this->documentNode      = $documentNode;
         $this->operationName     = $operationName;
     }
@@ -128,7 +129,7 @@ class CoroutineExecutor implements Runtime, ExecutorImplementation
         DocumentNode $documentNode,
         $rootValue,
         $contextValue,
-        $variableValues,
+        array $variableValues,
         ?string $operationName,
         callable $fieldResolver
     ) {
@@ -188,8 +189,8 @@ class CoroutineExecutor implements Runtime, ExecutorImplementation
 
         [$errors, $coercedVariableValues] = Values::getVariableValues(
             $this->schema,
-            $this->collector->operation->variableDefinitions ?? [],
-            $this->rawVariableValues ?? []
+            $this->collector->operation->variableDefinitions,
+            $this->rawVariableValues
         );
 
         if (count($errors ?? []) > 0) {

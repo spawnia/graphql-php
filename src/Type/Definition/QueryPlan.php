@@ -37,7 +37,7 @@ class QueryPlan
     /** @var array<string, mixed> */
     private $queryPlan = [];
 
-    /** @var mixed[] */
+    /** @var array<string, mixed> */
     private $variableValues;
 
     /** @var FragmentDefinitionNode[] */
@@ -48,7 +48,7 @@ class QueryPlan
 
     /**
      * @param FieldNode[]              $fieldNodes
-     * @param mixed[]                  $variableValues
+     * @param array<string, mixed>                  $variableValues
      * @param FragmentDefinitionNode[] $fragments
      * @param mixed[]                  $options
      */
@@ -155,9 +155,9 @@ class QueryPlan
 
     /**
      * @param InterfaceType|ObjectType $parentType
-     * @param mixed[]                  $implementors
+     * @param array<string, mixed>                  $implementors
      *
-     * @return mixed[]
+     * @return array<string, array{type: Type, fields: array<string, mixed>, args: array<mixed>, implementors?: array<string, mixed>}
      *
      * @throws Error
      */
@@ -179,7 +179,7 @@ class QueryPlan
 
                 $fields[$fieldName] = [
                     'type' => $selectionType,
-                    'fields' => $subfields ?? [],
+                    'fields' => $subfields,
                     'args' => Values::getArgumentValues($type, $selectionNode, $this->variableValues),
                 ];
                 if ($this->groupImplementorFields && $subImplementors) {
@@ -229,7 +229,7 @@ class QueryPlan
     /**
      * @param mixed[] $fields
      * @param mixed[] $subfields
-     * @param mixed[] $implementors
+     * @param array<string, array{type: Type, fields: array<mixed>}> $implementors
      *
      * @return mixed[]
      */

@@ -75,7 +75,7 @@ class ReferenceExecutor implements ExecutorImplementation
     /**
      * @param mixed                    $rootValue
      * @param mixed                    $contextValue
-     * @param array<mixed>|Traversable $variableValues
+     * @param array<string, mixed> $variableValues
      */
     public static function create(
         PromiseAdapter $promiseAdapter,
@@ -83,7 +83,7 @@ class ReferenceExecutor implements ExecutorImplementation
         DocumentNode $documentNode,
         $rootValue,
         $contextValue,
-        $variableValues,
+        array $variableValues,
         ?string $operationName,
         callable $fieldResolver
     ) : ExecutorImplementation {
@@ -125,7 +125,7 @@ class ReferenceExecutor implements ExecutorImplementation
      *
      * @param mixed                    $rootValue
      * @param mixed                    $contextValue
-     * @param array<mixed>|Traversable $rawVariableValues
+     * @param array<string, mixed> $rawVariableValues
      *
      * @return ExecutionContext|array<Error>
      */
@@ -134,7 +134,7 @@ class ReferenceExecutor implements ExecutorImplementation
         DocumentNode $documentNode,
         $rootValue,
         $contextValue,
-        $rawVariableValues,
+        array $rawVariableValues = [], // TODO typehint array
         ?string $operationName = null,
         ?callable $fieldResolver = null,
         ?PromiseAdapter $promiseAdapter = null
@@ -175,8 +175,8 @@ class ReferenceExecutor implements ExecutorImplementation
         if ($operation !== null) {
             [$coercionErrors, $coercedVariableValues] = Values::getVariableValues(
                 $schema,
-                $operation->variableDefinitions ?? [],
-                $rawVariableValues ?? []
+                $operation->variableDefinitions,
+                $rawVariableValues
             );
             if (count($coercionErrors ?? []) === 0) {
                 $variableValues = $coercedVariableValues;

@@ -187,7 +187,7 @@ class Helper
             );
         }
 
-        if ($params->variables !== null && (! is_array($params->variables) || isset($params->variables[0]))) {
+        if (! is_array($params->variables) || isset($params->variables[0])) {
             $errors[] = new RequestError(
                 'GraphQL Request parameter "variables" must be object or JSON string parsed to object, but got ' .
                 Utils::printSafeJson($params->getOriginalInput('variables'))
